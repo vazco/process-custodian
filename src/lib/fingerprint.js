@@ -25,9 +25,13 @@ const hostname = os.hostname().split('').reduce(function (prev, char) {
 
 const hostId = pad(hostname, padding);
 
+export const FINGERPRINT = hostId + pad(pid.toString(36), padding) + randomized;
+
 
 // Optimized for binary search lookup performance
-export const FINGERPRINT = hostId + pad(pid.toString(36), padding) + randomized;
+export function getFingerprint () {
+    return FINGERPRINT;
+}
 // Optimize for human
 export function humanize (fingerprint) {
     return fingerprint.match(/.{2}/g).join('-');

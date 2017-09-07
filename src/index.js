@@ -1,5 +1,11 @@
-import {FINGERPRINT, humanize} from './lib/fingerprint';
-import {init, isMasterCurrently} from './lib/mongoStorage';
+import {getFingerprint, humanize} from './lib/fingerprint';
+import {init} from './lib/mongoStorage';
 
-export {init, FINGERPRINT, humanize};
+
+export {
+    init,
+    getFingerprint,
+    humanize
+};
+
 export default init;

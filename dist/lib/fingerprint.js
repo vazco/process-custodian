@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 exports.FINGERPRINT = undefined;
+exports.getFingerprint = getFingerprint;
 exports.humanize = humanize;
 
 var _os = require('os');
@@ -36,8 +37,12 @@ var hostname = _os2.default.hostname().split('').reduce(function (prev, char) {
 
 var hostId = pad(hostname, padding);
 
-// Optimized for binary search lookup performance
 var FINGERPRINT = exports.FINGERPRINT = hostId + pad(pid.toString(36), padding) + randomized;
+
+// Optimized for binary search lookup performance
+function getFingerprint() {
+    return FINGERPRINT;
+}
 // Optimize for human
 function humanize(fingerprint) {
     return fingerprint.match(/.{2}/g).join('-');
