@@ -35,7 +35,7 @@ MongoClient.connect('mongodb://localhost:27017/test', function(err, db) {
 
   const handle = init({rawCollection: collection, tickTimeInSeconds: 60});
 
-  handle.onTick(() => {
+  const stopOnTick = handle.onTick(() => {
     console.log('tick', handle.isMaster() ? 'master': 'slave')
   });
   
@@ -61,9 +61,9 @@ const handle = init({
     tickTimeInSeconds: 60
 });
 
-handle.onTick(() => {
+handle.onceTick(() => {
     console.log('tick', handle.isMaster() ? 'master': 'slave')
-  });
+});
   
 handle.onIAmNewMaster(() => {
     console.log('I am master');
