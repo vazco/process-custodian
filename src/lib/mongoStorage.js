@@ -13,7 +13,12 @@ let _isMaster = false;
 let emitter = null;
 
 
-// handle of mongodb collection
+/**
+ *
+ * @param rawCollection
+ * @param tickTimeInSeconds: Number
+ * @returns {{isMaster: function, stop: function, onTick: function, onIAmNewMaster: function, onIAmSlave: function}}
+ */
 export function init ({rawCollection, tickTimeInSeconds = 60}) {
     emitter = new EventEmitter();
     collection = rawCollection;
@@ -24,7 +29,14 @@ export function init ({rawCollection, tickTimeInSeconds = 60}) {
         stop
     };
     // preparing methods onTick, onIAmNewMaster, onIAmSlave
-    Object.values(EVENTS).forEach(key => handler[`on${key}`] = (fn => emitter.on(key, fn)));
+    Object.values(EVENTS).forEach(key => handler[`on${key}`] = (fn => {
+        emitter.on(key, fn);
+        return () => emitter.removeListener(fn);
+    }));
+    // once
+    Object.values(EVENTS).forEach(key => handler[`once${key}`] = (fn => {
+        emitter.once(key, fn);
+    }));
     return handler;
 }
 
