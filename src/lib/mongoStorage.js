@@ -86,7 +86,7 @@ async function renewingMasterReservation (tickTime) {
     return false;
 }
 
-async function tryBeMaster (tickTime) {
+async function tryBeMaster (tickTime, isInit) {
     try {
         // check if you can be first master
         let result = await collection.updateOne({
@@ -102,7 +102,7 @@ async function tryBeMaster (tickTime) {
         }
         const deathDate = new Date();
         // no active master or last one is too busy to be master
-        deathDate.setSeconds(deathDate.getSeconds() - (tickTime * 3));
+        deathDate.setSeconds(deathDate.getSeconds() - (tickTime * (isInit? 2 : 3)));
         result = await collection.updateOne({
             // if no active master
             _id: MASTER_KEY,
@@ -140,7 +140,7 @@ function runActivityQueue(tickTimeInSeconds, isInit = false) {
             if (wasMaster) {
                 _isMaster = await renewingMasterReservation(tickTimeInSeconds);
             } else {
-                _isMaster = await tryBeMaster(tickTimeInSeconds);
+                _isMaster = await tryBeMaster(tickTimeInSeconds, isInit);
             }
             await oneHeartbeat(tickTimeInSeconds);
         } catch (err) {

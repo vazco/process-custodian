@@ -149,7 +149,7 @@ var renewingMasterReservation = function () {
 }();
 
 var tryBeMaster = function () {
-    var _ref5 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(tickTime) {
+    var _ref5 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(tickTime, isInit) {
         var result, deathDate;
         return _regenerator2.default.wrap(function _callee4$(_context4) {
             while (1) {
@@ -180,7 +180,7 @@ var tryBeMaster = function () {
                         deathDate = new Date();
                         // no active master or last one is too busy to be master
 
-                        deathDate.setSeconds(deathDate.getSeconds() - tickTime * 3);
+                        deathDate.setSeconds(deathDate.getSeconds() - tickTime * (isInit ? 2 : 3));
                         _context4.next = 10;
                         return collection.updateOne({
                             // if no active master
@@ -214,7 +214,7 @@ var tryBeMaster = function () {
         }, _callee4, this, [[0, 14]]);
     }));
 
-    return function tryBeMaster(_x3) {
+    return function tryBeMaster(_x3, _x4) {
         return _ref5.apply(this, arguments);
     };
 }();
@@ -312,7 +312,7 @@ function runActivityQueue(tickTimeInSeconds) {
 
                     case 8:
                         _context5.next = 10;
-                        return tryBeMaster(tickTimeInSeconds);
+                        return tryBeMaster(tickTimeInSeconds, isInit);
 
                     case 10:
                         _isMaster = _context5.sent;
