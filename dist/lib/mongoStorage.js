@@ -243,7 +243,12 @@ var collection = null;
 var _isMaster = false;
 var emitter = null;
 
-// handle of mongodb collection
+/**
+ *
+ * @param rawCollection
+ * @param tickTimeInSeconds: Number
+ * @returns {{isMaster: function, stop: function, onTick: function, onIAmNewMaster: function, onIAmSlave: function}}
+ */
 function init(_ref) {
     var rawCollection = _ref.rawCollection,
         _ref$tickTimeInSecond = _ref.tickTimeInSeconds,
@@ -260,7 +265,16 @@ function init(_ref) {
     // preparing methods onTick, onIAmNewMaster, onIAmSlave
     (0, _values2.default)(_constants.EVENTS).forEach(function (key) {
         return handler['on' + key] = function (fn) {
-            return emitter.on(key, fn);
+            emitter.on(key, fn);
+            return function () {
+                return emitter.removeListener(key, fn);
+            };
+        };
+    });
+    // once
+    (0, _values2.default)(_constants.EVENTS).forEach(function (key) {
+        return handler['once' + key] = function (fn) {
+            emitter.once(key, fn);
         };
     });
     return handler;

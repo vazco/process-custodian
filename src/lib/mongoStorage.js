@@ -31,7 +31,7 @@ export function init ({rawCollection, tickTimeInSeconds = 60}) {
     // preparing methods onTick, onIAmNewMaster, onIAmSlave
     Object.values(EVENTS).forEach(key => handler[`on${key}`] = (fn => {
         emitter.on(key, fn);
-        return () => emitter.removeListener(fn);
+        return () => emitter.removeListener(key, fn);
     }));
     // once
     Object.values(EVENTS).forEach(key => handler[`once${key}`] = (fn => {
