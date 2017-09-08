@@ -1,11 +1,15 @@
 import {getFingerprint, humanize} from './lib/fingerprint';
-import {init} from './lib/mongoStorage';
+import ProcessCustodian from './lib/ProcessCustodian';
 
 
 export {
-    init,
+    ProcessCustodian,
     getFingerprint,
     humanize
 };
 
-export default init;
+ProcessCustodian.ProcessCustodian = ProcessCustodian;
+ProcessCustodian.getFingerprint = getFingerprint;
+ProcessCustodian.humanize = humanize;
+
+export default ProcessCustodian;

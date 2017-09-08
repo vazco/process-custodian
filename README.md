@@ -15,7 +15,7 @@ Process fingerprint has 6 char length with structure: (hostname - pid - random).
 So, It is optimized for horizontal scaling and binary search lookup performance.
 
 
-After running `init` function, this package saves a heartbeat of process
+After create new instance of `ProcessCustodian`, this package saves a heartbeat of process
 to the passed raw mongodb collection with frequency about `tickTimeInSeconds` (which default is 60s)
 
 
@@ -25,7 +25,7 @@ or lose master role if will be too busy to save in database a heartbeat at the t
 
 ## Example of use - with pure mongodb collection
 ```#js
-import init from  'process-custodian';
+import ProcessCustodian from  'process-custodian';
 import {MongoClient}  from 'mongodb'
 
 MongoClient.connect('mongodb://localhost:27017/test', function(err, db) {
@@ -33,7 +33,7 @@ MongoClient.connect('mongodb://localhost:27017/test', function(err, db) {
   // Create a collection we want to drop later
   const collection = db.collection('process_custodian');
 
-  const handle = init({rawCollection: collection, tickTimeInSeconds: 60});
+  const handle = new ProcessCustodian({rawCollection: collection, tickTimeInSeconds: 60});
 
   const stopOnTick = handle.onTick(() => {
     console.log('tick', handle.isMaster() ? 'master': 'slave')
@@ -52,11 +52,11 @@ MongoClient.connect('mongodb://localhost:27017/test', function(err, db) {
 ## Example of use - with meteor collection
 
 ```#js
-import init from  'process-custodian';
+import ProcessCustodian from  'process-custodian';
 // for meteor:
 const collection = new Mongo.Collection('process_custodian');
 
-const handle = init({
+const handle = new ProcessCustodian({
     rawCollection: collection.rawCollection(),
     tickTimeInSeconds: 60
 });
@@ -81,7 +81,7 @@ handle.stop();
 ## Help tools
 
 ```
-import init, {getFingerprint, humanize} from  'process-custodian';
+import {getFingerprint, humanize} from  'process-custodian';
 
 //Getting fingerprint
 console.log('id:', getFingerprint()); // e.g. output: id: ji4fmf

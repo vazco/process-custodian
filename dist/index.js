@@ -3,13 +3,23 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.humanize = exports.getFingerprint = exports.init = undefined;
+exports.humanize = exports.getFingerprint = exports.ProcessCustodian = undefined;
 
 var _fingerprint = require('./lib/fingerprint');
 
-var _mongoStorage = require('./lib/mongoStorage');
+var _ProcessCustodian = require('./lib/ProcessCustodian');
 
-exports.init = _mongoStorage.init;
+var _ProcessCustodian2 = _interopRequireDefault(_ProcessCustodian);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.ProcessCustodian = _ProcessCustodian2.default;
 exports.getFingerprint = _fingerprint.getFingerprint;
 exports.humanize = _fingerprint.humanize;
-exports.default = _mongoStorage.init;
+
+
+_ProcessCustodian2.default.ProcessCustodian = _ProcessCustodian2.default;
+_ProcessCustodian2.default.getFingerprint = _fingerprint.getFingerprint;
+_ProcessCustodian2.default.humanize = _fingerprint.humanize;
+
+exports.default = _ProcessCustodian2.default;
