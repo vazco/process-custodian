@@ -22,14 +22,14 @@ class ProcessCustodian {
     _timeout = null;
     _stop = null;
 
-    constructor ({rawCollection, tickTimeInSeconds = 60}) {
+    constructor ({rawCollection, tickTimeInSeconds = 60, marginTimeForRenew = 20}) {
         if (!rawCollection) {
             throw new Error('Missing Collection in constructor of ProcessCustodian');
         }
         this._emitter = new EventEmitter();
         this._collection = rawCollection;
         ensureIndexExist.call(this, tickTimeInSeconds);
-        this._stop = runActivityQueue.call(this, tickTimeInSeconds, true);
+        this._stop = runActivityQueue.call(this, tickTimeInSeconds, marginTimeForRenew, true);
 
         // preparing methods onTick, onIAmNewMaster, onIAmSlave
         Object.values(EVENTS).forEach(key => this[`on${key}`] = (fn => {
@@ -91,9 +91,9 @@ async function oneHeartbeat () {
     return false;
 }
 
-async function renewingMasterReservation (tickTime) {
+async function renewingMasterReservation (tickTime, marginTimeForRenew) {
     const renewDate = new Date();
-    renewDate.setSeconds(renewDate.getSeconds() - (tickTime * 2));
+    renewDate.setSeconds(renewDate.getSeconds() - (tickTime + marginTimeForRenew));
     try {
         const result = await this._collection.updateOne({
             // if renewing own reservation
@@ -113,7 +113,7 @@ async function renewingMasterReservation (tickTime) {
     return false;
 }
 
-async function tryBeMaster (tickTime, isInit) {
+async function tryBeMaster (tickTime, marginTimeForRenew, isInit) {
     try {
         // check if you can be first master
         let result = await this._collection.updateOne({
@@ -131,8 +131,9 @@ async function tryBeMaster (tickTime, isInit) {
             return true;
         }
         const deathDate = new Date();
+        const limit = (tickTime + (isInit? marginTimeForRenew : (marginTimeForRenew * 2)));
         // no active master or last one is too busy to be master
-        deathDate.setSeconds(deathDate.getSeconds() - (tickTime * (isInit? 2 : 3)));
+        deathDate.setSeconds(deathDate.getSeconds() - limit);
         result = await this._collection.updateOne({
             // if no active master
             _id: MASTER_KEY,
@@ -158,25 +159,26 @@ function _stop () {
     }
 }
 
-function runActivityQueue(tickTimeInSeconds, isInit = false) {
+
+function runActivityQueue(tickTimeInSeconds, marginTimeForRenew, isInit = false) {
     if (isInit &&  this._timeout !== null) {
         // there is only one loop for activity per process
         return _stop.bind(this);
     }
-    this._timeout = setTimeout(async () => {
+    const doTick = async () => {
         const wasMaster = this._isMaster;
         try {
             if (wasMaster) {
-                this._isMaster = await renewingMasterReservation.call(this, tickTimeInSeconds);
+                this._isMaster = await renewingMasterReservation.call(this, tickTimeInSeconds, marginTimeForRenew);
             } else {
-                this._isMaster = await tryBeMaster.call(this, tickTimeInSeconds, isInit);
+                this._isMaster = await tryBeMaster.call(this, tickTimeInSeconds, marginTimeForRenew, isInit);
             }
             await oneHeartbeat.call(this, tickTimeInSeconds);
         } catch (err) {
             console.error('ActivityQueue:', err);
         }
         finally {
-            runActivityQueue.call(this, tickTimeInSeconds);
+            runActivityQueue.call(this, tickTimeInSeconds, marginTimeForRenew);
             this._emitter.emit(EVENTS.TICK);
             if (!wasMaster && this._isMaster) {
                 this._emitter.emit(EVENTS.I_AM_MASTER);
@@ -185,8 +187,12 @@ function runActivityQueue(tickTimeInSeconds, isInit = false) {
                 this._emitter.emit(EVENTS.I_AM_SLAVE);
             }
         }
-    }, isInit ? 0 : tickTimeInSeconds * 1000);
-
+    };
+    if (isInit) {
+        doTick();
+    } else {
+        this._timeout = setTimeout(doTick, tickTimeInSeconds * 1000);
+    }
     return _stop.bind(this);
 }
 
