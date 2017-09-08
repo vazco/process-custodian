@@ -22,7 +22,7 @@ class ProcessCustodian {
     _timeout = null;
     _stop = null;
 
-    constructor ({rawCollection, tickTimeInSeconds = 60, marginTimeForRenew = 20}) {
+    constructor ({rawCollection, tickTimeInSeconds = 60, marginTimeForRenew = 10}) {
         if (!rawCollection) {
             throw new Error('Missing Collection in constructor of ProcessCustodian');
         }

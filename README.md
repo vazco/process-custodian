@@ -59,7 +59,7 @@ const collection = new Mongo.Collection('process_custodian');
 const handle = new ProcessCustodian({
     rawCollection: collection.rawCollection(),
     tickTimeInSeconds: 60
-    marginTimeForRenew = 20
+    marginTimeForRenew = 10
 });
 
 handle.onceTick(() => {
