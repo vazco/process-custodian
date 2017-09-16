@@ -8,5 +8,6 @@ var MASTER_KEY = exports.MASTER_KEY = '_MASTER_';
 var EVENTS = exports.EVENTS = {
     TICK: 'Tick',
     I_AM_MASTER: 'IAmNewMaster',
-    I_AM_SLAVE: 'IAmSlave'
+    I_AM_SLAVE: 'IAmSlave',
+    STOP: 'Stop'
 };

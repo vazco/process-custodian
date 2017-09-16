@@ -17,15 +17,23 @@ const hostName = os.hostname();
  */
 
 class ProcessCustodian {
+    _standardHighLevel = 99;
+    _smoothingFactor = 1/3;
     _isMaster = false;
     _emitter = null;
     _timeout = null;
+    _currentLag = 0;
+    _expectedFiredTime = Infinity;
     _stop = null;
 
-    constructor ({rawCollection, tickTimeInSeconds = 60, marginTimeForRenew = 10}) {
+    constructor ({rawCollection, tickTimeInSeconds = 45, marginTimeForRenew = 15, standardHighLevel = 100}) {
         if (!rawCollection) {
             throw new Error('Missing Collection in constructor of ProcessCustodian');
         }
+        if (typeof Meteor === 'object' && Meteor.bindEnvironment) {
+            this._bindEnvironment = Meteor.bindEnvironment;
+        }
+        this._standardHighLevel = standardHighLevel;
         this._emitter = new EventEmitter();
         this._collection = rawCollection;
         ensureIndexExist.call(this, tickTimeInSeconds);
@@ -33,25 +41,101 @@ class ProcessCustodian {
 
         // preparing methods onTick, onIAmNewMaster, onIAmSlave
         Object.values(EVENTS).forEach(key => this[`on${key}`] = (fn => {
+            if (this._bindEnvironment) {
+                fn = this._bindEnvironment(fn);
+            }
             this._emitter.on(key, fn);
             return () => this._emitter.removeListener(key, fn);
         }));
         // once
         Object.values(EVENTS).forEach(key => this[`once${key}`] = (fn => {
+            if (this._bindEnvironment) {
+                fn = this._bindEnvironment(fn);
+            }
             this._emitter.once(key, fn);
         }));
     }
 
+    /**
+     * fired on every checking of the event loop
+     * @param {function} - event handler
+     * @returns {function} - stop handler
+     */
+    onTick = noop;
+    /**
+     * fired every time when process will being a master
+     * @param {function} - event handler
+     * @returns {function} - stop handler
+     */
+    onIAmNewMaster = noop;
+    /**
+     * runs every time when process is going back to be a slave
+     * @param {function} - event handler
+     * @returns {function} - stop listening handler
+     */
+    onIAmSlave = noop;
+
+    /**
+     * Runs the passed function on next checking of the event loop
+     * @param {function} - event handler
+     * @returns {function} - stop handler
+     */
+    onceTick = noop;
+    /**
+     * fired once when process being be a master
+     * @param {function} - event handler
+     * @returns {function} - stop handler
+     */
+    onceIAmNewMaster = noop;
+    /**
+     * fired one time when process will lost master status
+     * @param {function} - event handler
+     * @returns {function} - stop handler
+     */
+    onceIAmSlave = noop;
+
+    /**
+     * Is this master process?
+     * @returns {boolean}
+     */
     isMaster = () => {
         return this._isMaster;
     };
 
+    /**
+     * lag value from last sampling of event loop
+     * @returns {number}
+     */
+    getLag () {
+        return Math.round(this._currentLag);
+    }
+
+    /**
+     * Checks if the event loop lag is on too high level.
+     * Using this information you can put away of computing new job,
+     * or even stop the request processing early then process will freeze
+     */
+    isOverloaded () {
+        return this._currentLag > this._standardHighLevel;
+    }
+
+    /**
+     * Uniq fingerprint of process
+     */
+    getFingerprint () {
+        return FINGERPRINT;
+    }
+
+    /**
+     * stops sampling loop
+     */
     stop = () => {
         if (this._stop) {
             this._stop();
             this._collection.deleteOne({_id: FINGERPRINT});
             this._collection.deleteOne({id: MASTER_KEY, FINGERPRINT});
             this._stop = null;
+            this._emitter.emit(EVENTS.STOP);
         }
     };
 }
@@ -76,6 +160,7 @@ async function oneHeartbeat () {
                 _id: FINGERPRINT,
                 title: process.title,
                 processStartAt: processStartAt,
+                eventLoopLag: this.getLag(),
                 hostName,
                 pid
             },
@@ -98,11 +183,11 @@ async function renewingMasterReservation (tickTime, marginTimeForRenew) {
         const result = await this._collection.updateOne({
             // if renewing own reservation
             _id: MASTER_KEY,
-            FINGERPRINT,
+            fingerprint: FINGERPRINT,
             lastActivity: {$gte: renewDate}
         }, {
             $set: {
-                FINGERPRINT,
+                fingerprint: FINGERPRINT,
                 lastActivity: new Date()
             }
         });
@@ -122,6 +207,7 @@ async function tryBeMaster (tickTime, marginTimeForRenew, isInit) {
         }, {
             $setOnInsert: {
                 _id: MASTER_KEY,
+                fingerprint: FINGERPRINT,
                 lastActivity: new Date()
             }
         }, {
@@ -140,7 +226,7 @@ async function tryBeMaster (tickTime, marginTimeForRenew, isInit) {
             lastActivity: {$lt: deathDate}
         }, {
             $set: {
-                FINGERPRINT,
+                fingerprint: FINGERPRINT,
                 lastActivity: new Date()
             }
         });
@@ -167,10 +253,15 @@ function runActivityQueue(tickTimeInSeconds, marginTimeForRenew, isInit = false)
     }
     const doTick = async () => {
         const wasMaster = this._isMaster;
+        let lag = Math.max(0, (Date.now() - this._expectedFiredTime));
+        // @see https://en.wikipedia.org/wiki/Exponential_smoothing
+        // we weigh the current value against the previous value 3:1 to smooth bounds.
+        this._currentLag = this._smoothingFactor *  lag + (1 - this._smoothingFactor) * this._currentLag;
         try {
             if (wasMaster) {
                 this._isMaster = await renewingMasterReservation.call(this, tickTimeInSeconds, marginTimeForRenew);
-            } else {
+            } else if (!this.isOverloaded()) {
+                //don't want to try to be a master is with crossed standard lag limit
                 this._isMaster = await tryBeMaster.call(this, tickTimeInSeconds, marginTimeForRenew, isInit);
             }
             await oneHeartbeat.call(this, tickTimeInSeconds);
@@ -178,6 +269,7 @@ function runActivityQueue(tickTimeInSeconds, marginTimeForRenew, isInit = false)
             console.error('ActivityQueue:', err);
         }
         finally {
+            this._expectedFiredTime = Date.now() + tickTimeInSeconds * 1000;
             runActivityQueue.call(this, tickTimeInSeconds, marginTimeForRenew);
             this._emitter.emit(EVENTS.TICK);
             if (!wasMaster && this._isMaster) {
@@ -192,8 +284,12 @@ function runActivityQueue(tickTimeInSeconds, marginTimeForRenew, isInit = false)
         doTick();
     } else {
         this._timeout = setTimeout(doTick, tickTimeInSeconds * 1000);
+        // unref-ing the timeout, so to not be the only action that would hold the node-process open.
+        this._timeout.unref && this._timeout.unref();
     }
     return _stop.bind(this);
 }
 
-
+function noop () {
+    /* noop */
+}
