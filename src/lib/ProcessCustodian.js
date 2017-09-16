@@ -106,7 +106,7 @@ class ProcessCustodian {
      * lag value from last sampling of event loop
      * @returns {number}
      */
-    getLag () {
+    getEventLoopLag () {
         return Math.round(this._currentLag);
     }
 
@@ -160,7 +160,7 @@ async function oneHeartbeat () {
                 _id: FINGERPRINT,
                 title: process.title,
                 processStartAt: processStartAt,
-                eventLoopLag: this.getLag(),
+                eventLoopLag: this.getEventLoopLag(),
                 hostName,
                 pid
             },

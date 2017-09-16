@@ -15,7 +15,7 @@ const porocessCustodian = new ProcessCustodian({
 describe('lagging', () => {
     it('should be instance of ProcessCustodian', () => {
         expect(porocessCustodian).to.be.instanceof(ProcessCustodian);
-        expect(porocessCustodian.getLag).to.be.function;
+        expect(porocessCustodian.getEventLoopLag).to.be.function;
         expect(porocessCustodian.isOverloaded).to.be.function;
         expect(porocessCustodian.onceIAmNewMaster).to.be.function;
         expect(porocessCustodian.onceIAmSlave).to.be.function;
@@ -26,7 +26,7 @@ describe('lagging', () => {
         expect(porocessCustodian.onTick).to.be.function;
     });
     it('should return no lag ', () => {
-        const noLag = porocessCustodian.getLag();
+        const noLag = porocessCustodian.getEventLoopLag();
         expect(noLag).be.equal(0);
     });
     it('should once called on tick should', () => {
@@ -49,7 +49,7 @@ describe('lagging', () => {
         heavyWork(200);
         clock.tick(200001);
         console.log('Stop heavy work');
-        const lag = porocessCustodian.getLag();
+        const lag = porocessCustodian.getEventLoopLag();
         expect(lag).be.above(1);
     });
 });
