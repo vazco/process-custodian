@@ -33,7 +33,7 @@ MongoClient.connect('mongodb://localhost:27017/test', function(err, db) {
   // Create a collection we want to drop later
   const collection = db.collection('process_custodian');
 
-  const handle = new ProcessCustodian({rawCollection: collection, tickTimeInSeconds: 60});
+  const handle = new ProcessCustodian({rawCollection: collection, tickTimeInSeconds: 45});
 
   const stopOnTick = handle.onTick(() => {
     console.log('tick', handle.isMaster() ? 'master': 'slave')
