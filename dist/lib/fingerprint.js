@@ -31,9 +31,9 @@ function pad(num, size) {
 
 var length = _os2.default.hostname().length;
 
-var hostname = _os2.default.hostname().split('').reduce(function (prev, char) {
+var hostname = (_os2.default.hostname().split('').reduce(function (prev, char) {
     return +prev + char.charCodeAt(0);
-}, +length + 36).toString(36);
+}) + length + 36).toString(36);
 
 var hostId = pad(hostname, padding);
 
