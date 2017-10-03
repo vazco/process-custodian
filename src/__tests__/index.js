@@ -1,7 +1,7 @@
-import {MASTER_KEY, EVENTS} from '../lib/constants';
+import {MASTER_KEY} from '../lib/constants';
 import ProcessCustodian from  '../lib/ProcessCustodian';
 import {mockCollection} from './mock';
-import {mock, useFakeTimers, stub} from 'sinon';
+import {useFakeTimers} from 'sinon';
 import {expect, assert} from 'chai';
 const {describe, it, beforeEach, afterEach} = global;
 const tickTimeInSeconds = 10;

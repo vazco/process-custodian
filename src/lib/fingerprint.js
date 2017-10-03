@@ -19,9 +19,9 @@ function pad (num, size) {
 
 const length = os.hostname().length;
 
-const hostname = os.hostname().split('').reduce(function (prev, char) {
+const hostname = (os.hostname().split('').reduce((prev, char) => {
     return +prev + char.charCodeAt(0);
-}, + length + 36).toString(36);
+}) + length + 36).toString(36);
 
 const hostId = pad(hostname, padding);
 
@@ -36,7 +36,3 @@ export function getFingerprint () {
 export function humanize (fingerprint) {
     return fingerprint.match(/.{2}/g).join('-');
 }
-
-
-
-

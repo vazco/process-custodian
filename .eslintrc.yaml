@@ -2,3 +2,4 @@ extends:
   - vazco
 globals:
   - global
+  - Meteor
