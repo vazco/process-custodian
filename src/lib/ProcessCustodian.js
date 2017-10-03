@@ -149,7 +149,7 @@ async function ensureIndexExist (tickTimeInSeconds) {
         await this._collection.createIndex({lastActivity: -1}, {
             name: 'ttl',
             expireAfterSeconds: tickTimeInSeconds * 3
-        })
+        });
     }
 }
 
@@ -159,13 +159,13 @@ async function oneHeartbeat () {
             $setOnInsert: {
                 _id: FINGERPRINT,
                 title: process.title,
-                processStartAt: processStartAt,
                 eventLoopLag: this.getEventLoopLag(),
+                processStartAt,
                 hostName,
                 pid
             },
             $set: {
-                lastActivity: new Date(),
+                lastActivity: new Date()
             }
         }, {sort: {lastActivity: -1}, upsert: true});
 
@@ -239,21 +239,23 @@ async function tryBeMaster (tickTime, marginTimeForRenew, isInit) {
 
 
 function _stop () {
-    if (this._timeout !== null) {
-        clearTimeout(this._timeout);
-        this._timeout = null;
-    }
+    process.nextTick(() => {
+        if (this._timeout !== null) {
+            clearTimeout(this._timeout);
+            this._timeout = null;
+        }
+    });
 }
 
 
-function runActivityQueue(tickTimeInSeconds, marginTimeForRenew, isInit = false) {
+function runActivityQueue (tickTimeInSeconds, marginTimeForRenew, isInit = false) {
     if (isInit &&  this._timeout !== null) {
         // there is only one loop for activity per process
         return _stop.bind(this);
     }
     const doTick = async () => {
         const wasMaster = this._isMaster;
-        let lag = Math.max(0, (Date.now() - this._expectedFiredTime));
+        const lag = Math.max(0, (Date.now() - this._expectedFiredTime));
         // @see https://en.wikipedia.org/wiki/Exponential_smoothing
         // we weigh the current value against the previous value 3:1 to smooth bounds.
         this._currentLag = this._smoothingFactor *  lag + (1 - this._smoothingFactor) * this._currentLag;

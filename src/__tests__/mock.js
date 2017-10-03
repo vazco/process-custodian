@@ -1,9 +1,9 @@
 import {stub} from 'sinon';
-export const mockCollection = extend => ({
+export const mockCollection = () => ({
     indexExists: stub(),
     createIndex: stub(),
     find: stub(),
-    updateOne: stub().returns({upsertedCount: 1, modifiedCount: 0}),
+    updateOne: stub().returns({upsertedCount: 0, modifiedCount: 0}),
     insert: stub(),
     deleteOne: stub()
 });
