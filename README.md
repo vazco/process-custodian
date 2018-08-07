@@ -1,4 +1,8 @@
-# Process Custodian
+<h1 align="center">
+    <a href="https://github.com/vazco">vazco</a>/Process Custodian
+</h1>
+
+&nbsp;
 
 This package helps with organizing of tasks between few instances of same app, It can identify processes and track them activity.
 
@@ -89,7 +93,8 @@ console.log('id:', getFingerprint()); // e.g. output: id: ji4fmf
 console.log('human:', humanize(getFingerprint())); // e.g. output: human: ji-4f-mf
 ```
 
+### License
 
+<img src="https://vazco.eu/banner.png" align="right">
 
-
-
+**Like every package maintained by [Vazco](https://vazco.eu/), Process Custodian is [MIT licensed](https://github.com/vazco/uniforms/blob/master/LICENSE).**
