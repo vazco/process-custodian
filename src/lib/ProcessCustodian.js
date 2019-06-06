@@ -269,8 +269,7 @@ function runActivityQueue (tickTimeInSeconds, marginTimeForRenew, isInit = false
             await oneHeartbeat.call(this, tickTimeInSeconds);
         } catch (err) {
             console.error('ActivityQueue:', err);
-        }
-        finally {
+        } finally {
             this._expectedFiredTime = Date.now() + tickTimeInSeconds * 1000;
             runActivityQueue.call(this, tickTimeInSeconds, marginTimeForRenew);
             this._emitter.emit(EVENTS.TICK);

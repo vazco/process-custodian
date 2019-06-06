@@ -1,5 +1,5 @@
 extends:
   - vazco
 globals:
-  - global
-  - Meteor
+  global: false
+  Meteor: false
