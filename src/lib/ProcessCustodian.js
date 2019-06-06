@@ -129,11 +129,11 @@ class ProcessCustodian {
     /**
      * stops sampling loop
      */
-    stop = () => {
+    stop = async () => {
         if (this._stop) {
+            await this._collection.deleteOne({_id: FINGERPRINT});
+            await this._collection.deleteOne({id: MASTER_KEY, FINGERPRINT});
             this._stop();
-            this._collection.deleteOne({_id: FINGERPRINT});
-            this._collection.deleteOne({id: MASTER_KEY, FINGERPRINT});
             this._stop = null;
             this._emitter.emit(EVENTS.STOP);
         }

@@ -4,14 +4,6 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _regenerator = require('babel-runtime/regenerator');
-
-var _regenerator2 = _interopRequireDefault(_regenerator);
-
-var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
-
-var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
-
 var _values = require('babel-runtime/core-js/object/values');
 
 var _values2 = _interopRequireDefault(_values);
@@ -19,6 +11,14 @@ var _values2 = _interopRequireDefault(_values);
 var _typeof2 = require('babel-runtime/helpers/typeof');
 
 var _typeof3 = _interopRequireDefault(_typeof2);
+
+var _regenerator = require('babel-runtime/regenerator');
+
+var _regenerator2 = _interopRequireDefault(_regenerator);
+
+var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
+
+var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
@@ -29,21 +29,21 @@ var _createClass2 = require('babel-runtime/helpers/createClass');
 var _createClass3 = _interopRequireDefault(_createClass2);
 
 var ensureIndexExist = function () {
-    var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(tickTimeInSeconds) {
-        return _regenerator2.default.wrap(function _callee$(_context) {
+    var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(tickTimeInSeconds) {
+        return _regenerator2.default.wrap(function _callee2$(_context2) {
             while (1) {
-                switch (_context.prev = _context.next) {
+                switch (_context2.prev = _context2.next) {
                     case 0:
-                        _context.next = 2;
+                        _context2.next = 2;
                         return this._collection.indexExists('ttl');
 
                     case 2:
-                        if (_context.sent) {
-                            _context.next = 5;
+                        if (_context2.sent) {
+                            _context2.next = 5;
                             break;
                         }
 
-                        _context.next = 5;
+                        _context2.next = 5;
                         return this._collection.createIndex({ lastActivity: -1 }, {
                             name: 'ttl',
                             expireAfterSeconds: tickTimeInSeconds * 3
@@ -51,26 +51,26 @@ var ensureIndexExist = function () {
 
                     case 5:
                     case 'end':
-                        return _context.stop();
+                        return _context2.stop();
                 }
             }
-        }, _callee, this);
+        }, _callee2, this);
     }));
 
     return function ensureIndexExist(_x) {
-        return _ref2.apply(this, arguments);
+        return _ref3.apply(this, arguments);
     };
 }();
 
 var oneHeartbeat = function () {
-    var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
+    var _ref4 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3() {
         var result;
-        return _regenerator2.default.wrap(function _callee2$(_context2) {
+        return _regenerator2.default.wrap(function _callee3$(_context3) {
             while (1) {
-                switch (_context2.prev = _context2.next) {
+                switch (_context3.prev = _context3.next) {
                     case 0:
-                        _context2.prev = 0;
-                        _context2.next = 3;
+                        _context3.prev = 0;
+                        _context3.next = 3;
                         return this._collection.updateOne({ _id: _fingerprint.FINGERPRINT }, {
                             $setOnInsert: {
                                 _id: _fingerprint.FINGERPRINT,
@@ -86,43 +86,43 @@ var oneHeartbeat = function () {
                         }, { sort: { lastActivity: -1 }, upsert: true });
 
                     case 3:
-                        result = _context2.sent;
-                        return _context2.abrupt('return', result.upsertedCount || result.modifiedCount);
+                        result = _context3.sent;
+                        return _context3.abrupt('return', result.upsertedCount || result.modifiedCount);
 
                     case 7:
-                        _context2.prev = 7;
-                        _context2.t0 = _context2['catch'](0);
+                        _context3.prev = 7;
+                        _context3.t0 = _context3['catch'](0);
 
-                        console.error('ActivityQueue[oneHeartbeat]:', _context2.t0);
+                        console.error('ActivityQueue[oneHeartbeat]:', _context3.t0);
 
                     case 10:
-                        return _context2.abrupt('return', false);
+                        return _context3.abrupt('return', false);
 
                     case 11:
                     case 'end':
-                        return _context2.stop();
+                        return _context3.stop();
                 }
             }
-        }, _callee2, this, [[0, 7]]);
+        }, _callee3, this, [[0, 7]]);
     }));
 
     return function oneHeartbeat() {
-        return _ref3.apply(this, arguments);
+        return _ref4.apply(this, arguments);
     };
 }();
 
 var renewingMasterReservation = function () {
-    var _ref4 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3(tickTime, marginTimeForRenew) {
+    var _ref5 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(tickTime, marginTimeForRenew) {
         var renewDate, result;
-        return _regenerator2.default.wrap(function _callee3$(_context3) {
+        return _regenerator2.default.wrap(function _callee4$(_context4) {
             while (1) {
-                switch (_context3.prev = _context3.next) {
+                switch (_context4.prev = _context4.next) {
                     case 0:
                         renewDate = new Date();
 
                         renewDate.setSeconds(renewDate.getSeconds() - (tickTime + marginTimeForRenew));
-                        _context3.prev = 2;
-                        _context3.next = 5;
+                        _context4.prev = 2;
+                        _context4.next = 5;
                         return this._collection.updateOne({
                             // if renewing own reservation
                             _id: _constants.MASTER_KEY,
@@ -136,40 +136,40 @@ var renewingMasterReservation = function () {
                         });
 
                     case 5:
-                        result = _context3.sent;
-                        return _context3.abrupt('return', result.modifiedCount);
+                        result = _context4.sent;
+                        return _context4.abrupt('return', result.modifiedCount);
 
                     case 9:
-                        _context3.prev = 9;
-                        _context3.t0 = _context3['catch'](2);
+                        _context4.prev = 9;
+                        _context4.t0 = _context4['catch'](2);
 
-                        console.error('ActivityQueue[renewingMasterReservation]:', _context3.t0);
+                        console.error('ActivityQueue[renewingMasterReservation]:', _context4.t0);
 
                     case 12:
-                        return _context3.abrupt('return', false);
+                        return _context4.abrupt('return', false);
 
                     case 13:
                     case 'end':
-                        return _context3.stop();
+                        return _context4.stop();
                 }
             }
-        }, _callee3, this, [[2, 9]]);
+        }, _callee4, this, [[2, 9]]);
     }));
 
     return function renewingMasterReservation(_x2, _x3) {
-        return _ref4.apply(this, arguments);
+        return _ref5.apply(this, arguments);
     };
 }();
 
 var tryBeMaster = function () {
-    var _ref5 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(tickTime, marginTimeForRenew, isInit) {
+    var _ref6 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5(tickTime, marginTimeForRenew, isInit) {
         var result, deathDate, limit;
-        return _regenerator2.default.wrap(function _callee4$(_context4) {
+        return _regenerator2.default.wrap(function _callee5$(_context5) {
             while (1) {
-                switch (_context4.prev = _context4.next) {
+                switch (_context5.prev = _context5.next) {
                     case 0:
-                        _context4.prev = 0;
-                        _context4.next = 3;
+                        _context5.prev = 0;
+                        _context5.next = 3;
                         return this._collection.updateOne({
                             // if no active master
                             _id: _constants.MASTER_KEY
@@ -184,14 +184,14 @@ var tryBeMaster = function () {
                         });
 
                     case 3:
-                        result = _context4.sent;
+                        result = _context5.sent;
 
                         if (!result.upsertedCount) {
-                            _context4.next = 6;
+                            _context5.next = 6;
                             break;
                         }
 
-                        return _context4.abrupt('return', true);
+                        return _context5.abrupt('return', true);
 
                     case 6:
                         deathDate = new Date();
@@ -199,7 +199,7 @@ var tryBeMaster = function () {
                         // no active master or last one is too busy to be master
 
                         deathDate.setSeconds(deathDate.getSeconds() - limit);
-                        _context4.next = 11;
+                        _context5.next = 11;
                         return this._collection.updateOne({
                             // if no active master
                             _id: _constants.MASTER_KEY,
@@ -212,28 +212,28 @@ var tryBeMaster = function () {
                         });
 
                     case 11:
-                        result = _context4.sent;
-                        return _context4.abrupt('return', result.modifiedCount);
+                        result = _context5.sent;
+                        return _context5.abrupt('return', result.modifiedCount);
 
                     case 15:
-                        _context4.prev = 15;
-                        _context4.t0 = _context4['catch'](0);
+                        _context5.prev = 15;
+                        _context5.t0 = _context5['catch'](0);
 
-                        console.error('ActivityQueue[tryBeMaster]:', _context4.t0);
+                        console.error('ActivityQueue[tryBeMaster]:', _context5.t0);
 
                     case 18:
-                        return _context4.abrupt('return', false);
+                        return _context5.abrupt('return', false);
 
                     case 19:
                     case 'end':
-                        return _context4.stop();
+                        return _context5.stop();
                 }
             }
-        }, _callee4, this, [[0, 15]]);
+        }, _callee5, this, [[0, 15]]);
     }));
 
     return function tryBeMaster(_x4, _x5, _x6) {
-        return _ref5.apply(this, arguments);
+        return _ref6.apply(this, arguments);
     };
 }();
 
@@ -294,15 +294,35 @@ var ProcessCustodian = function () {
             return _this._isMaster;
         };
 
-        this.stop = function () {
-            if (_this._stop) {
-                _this._stop();
-                _this._collection.deleteOne({ _id: _fingerprint.FINGERPRINT });
-                _this._collection.deleteOne({ id: _constants.MASTER_KEY, FINGERPRINT: _fingerprint.FINGERPRINT });
-                _this._stop = null;
-                _this._emitter.emit(_constants.EVENTS.STOP);
-            }
-        };
+        this.stop = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
+            return _regenerator2.default.wrap(function _callee$(_context) {
+                while (1) {
+                    switch (_context.prev = _context.next) {
+                        case 0:
+                            if (!_this._stop) {
+                                _context.next = 8;
+                                break;
+                            }
+
+                            _context.next = 3;
+                            return _this._collection.deleteOne({ _id: _fingerprint.FINGERPRINT });
+
+                        case 3:
+                            _context.next = 5;
+                            return _this._collection.deleteOne({ id: _constants.MASTER_KEY, FINGERPRINT: _fingerprint.FINGERPRINT });
+
+                        case 5:
+                            _this._stop();
+                            _this._stop = null;
+                            _this._emitter.emit(_constants.EVENTS.STOP);
+
+                        case 8:
+                        case 'end':
+                            return _context.stop();
+                    }
+                }
+            }, _callee, _this);
+        }));
 
         if (!rawCollection) {
             throw new Error('Missing Collection in constructor of ProcessCustodian');
@@ -449,11 +469,11 @@ function runActivityQueue(tickTimeInSeconds, marginTimeForRenew) {
         return _stop.bind(this);
     }
     var doTick = function () {
-        var _ref6 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5() {
+        var _ref7 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee6() {
             var wasMaster, lag;
-            return _regenerator2.default.wrap(function _callee5$(_context5) {
+            return _regenerator2.default.wrap(function _callee6$(_context6) {
                 while (1) {
-                    switch (_context5.prev = _context5.next) {
+                    switch (_context6.prev = _context6.next) {
                         case 0:
                             wasMaster = _this3._isMaster;
                             lag = Math.max(0, Date.now() - _this3._expectedFiredTime);
@@ -461,49 +481,49 @@ function runActivityQueue(tickTimeInSeconds, marginTimeForRenew) {
                             // we weigh the current value against the previous value 3:1 to smooth bounds.
 
                             _this3._currentLag = _this3._smoothingFactor * lag + (1 - _this3._smoothingFactor) * _this3._currentLag;
-                            _context5.prev = 3;
+                            _context6.prev = 3;
 
                             if (!wasMaster) {
-                                _context5.next = 10;
+                                _context6.next = 10;
                                 break;
                             }
 
-                            _context5.next = 7;
+                            _context6.next = 7;
                             return renewingMasterReservation.call(_this3, tickTimeInSeconds, marginTimeForRenew);
 
                         case 7:
-                            _this3._isMaster = _context5.sent;
-                            _context5.next = 14;
+                            _this3._isMaster = _context6.sent;
+                            _context6.next = 14;
                             break;
 
                         case 10:
                             if (_this3.isOverloaded()) {
-                                _context5.next = 14;
+                                _context6.next = 14;
                                 break;
                             }
 
-                            _context5.next = 13;
+                            _context6.next = 13;
                             return tryBeMaster.call(_this3, tickTimeInSeconds, marginTimeForRenew, isInit);
 
                         case 13:
-                            _this3._isMaster = _context5.sent;
+                            _this3._isMaster = _context6.sent;
 
                         case 14:
-                            _context5.next = 16;
+                            _context6.next = 16;
                             return oneHeartbeat.call(_this3, tickTimeInSeconds);
 
                         case 16:
-                            _context5.next = 21;
+                            _context6.next = 21;
                             break;
 
                         case 18:
-                            _context5.prev = 18;
-                            _context5.t0 = _context5['catch'](3);
+                            _context6.prev = 18;
+                            _context6.t0 = _context6['catch'](3);
 
-                            console.error('ActivityQueue:', _context5.t0);
+                            console.error('ActivityQueue:', _context6.t0);
 
                         case 21:
-                            _context5.prev = 21;
+                            _context6.prev = 21;
 
                             _this3._expectedFiredTime = Date.now() + tickTimeInSeconds * 1000;
                             runActivityQueue.call(_this3, tickTimeInSeconds, marginTimeForRenew);
@@ -514,18 +534,18 @@ function runActivityQueue(tickTimeInSeconds, marginTimeForRenew) {
                             if ((wasMaster || isInit) && !_this3._isMaster) {
                                 _this3._emitter.emit(_constants.EVENTS.I_AM_SLAVE);
                             }
-                            return _context5.finish(21);
+                            return _context6.finish(21);
 
                         case 28:
                         case 'end':
-                            return _context5.stop();
+                            return _context6.stop();
                     }
                 }
-            }, _callee5, _this3, [[3, 18, 21, 28]]);
+            }, _callee6, _this3, [[3, 18, 21, 28]]);
         }));
 
         return function doTick() {
-            return _ref6.apply(this, arguments);
+            return _ref7.apply(this, arguments);
         };
     }();
     if (isInit) {
