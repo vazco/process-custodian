@@ -1,6 +1,6 @@
 {
   "name": "process-custodian",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "This package helps with organizing of tasks between few instances of same app, It can identify processes and track them activity.",
   "main": "index.js",
   "scripts": {

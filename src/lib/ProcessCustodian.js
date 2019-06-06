@@ -239,12 +239,10 @@ async function tryBeMaster (tickTime, marginTimeForRenew, isInit) {
 
 
 function _stop () {
-    process.nextTick(() => {
-        if (this._timeout !== null) {
-            clearTimeout(this._timeout);
-            this._timeout = null;
-        }
-    });
+    if (this._timeout !== null) {
+        clearTimeout(this._timeout);
+        this._timeout = null;
+    }
 }
 
 

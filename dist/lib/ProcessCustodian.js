@@ -449,18 +449,14 @@ exports.default = ProcessCustodian;
 
 
 function _stop() {
-    var _this2 = this;
-
-    process.nextTick(function () {
-        if (_this2._timeout !== null) {
-            clearTimeout(_this2._timeout);
-            _this2._timeout = null;
-        }
-    });
+    if (this._timeout !== null) {
+        clearTimeout(this._timeout);
+        this._timeout = null;
+    }
 }
 
 function runActivityQueue(tickTimeInSeconds, marginTimeForRenew) {
-    var _this3 = this;
+    var _this2 = this;
 
     var isInit = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
@@ -475,12 +471,12 @@ function runActivityQueue(tickTimeInSeconds, marginTimeForRenew) {
                 while (1) {
                     switch (_context6.prev = _context6.next) {
                         case 0:
-                            wasMaster = _this3._isMaster;
-                            lag = Math.max(0, Date.now() - _this3._expectedFiredTime);
+                            wasMaster = _this2._isMaster;
+                            lag = Math.max(0, Date.now() - _this2._expectedFiredTime);
                             // @see https://en.wikipedia.org/wiki/Exponential_smoothing
                             // we weigh the current value against the previous value 3:1 to smooth bounds.
 
-                            _this3._currentLag = _this3._smoothingFactor * lag + (1 - _this3._smoothingFactor) * _this3._currentLag;
+                            _this2._currentLag = _this2._smoothingFactor * lag + (1 - _this2._smoothingFactor) * _this2._currentLag;
                             _context6.prev = 3;
 
                             if (!wasMaster) {
@@ -489,28 +485,28 @@ function runActivityQueue(tickTimeInSeconds, marginTimeForRenew) {
                             }
 
                             _context6.next = 7;
-                            return renewingMasterReservation.call(_this3, tickTimeInSeconds, marginTimeForRenew);
+                            return renewingMasterReservation.call(_this2, tickTimeInSeconds, marginTimeForRenew);
 
                         case 7:
-                            _this3._isMaster = _context6.sent;
+                            _this2._isMaster = _context6.sent;
                             _context6.next = 14;
                             break;
 
                         case 10:
-                            if (_this3.isOverloaded()) {
+                            if (_this2.isOverloaded()) {
                                 _context6.next = 14;
                                 break;
                             }
 
                             _context6.next = 13;
-                            return tryBeMaster.call(_this3, tickTimeInSeconds, marginTimeForRenew, isInit);
+                            return tryBeMaster.call(_this2, tickTimeInSeconds, marginTimeForRenew, isInit);
 
                         case 13:
-                            _this3._isMaster = _context6.sent;
+                            _this2._isMaster = _context6.sent;
 
                         case 14:
                             _context6.next = 16;
-                            return oneHeartbeat.call(_this3, tickTimeInSeconds);
+                            return oneHeartbeat.call(_this2, tickTimeInSeconds);
 
                         case 16:
                             _context6.next = 21;
@@ -525,14 +521,14 @@ function runActivityQueue(tickTimeInSeconds, marginTimeForRenew) {
                         case 21:
                             _context6.prev = 21;
 
-                            _this3._expectedFiredTime = Date.now() + tickTimeInSeconds * 1000;
-                            runActivityQueue.call(_this3, tickTimeInSeconds, marginTimeForRenew);
-                            _this3._emitter.emit(_constants.EVENTS.TICK);
-                            if (!wasMaster && _this3._isMaster) {
-                                _this3._emitter.emit(_constants.EVENTS.I_AM_MASTER);
+                            _this2._expectedFiredTime = Date.now() + tickTimeInSeconds * 1000;
+                            runActivityQueue.call(_this2, tickTimeInSeconds, marginTimeForRenew);
+                            _this2._emitter.emit(_constants.EVENTS.TICK);
+                            if (!wasMaster && _this2._isMaster) {
+                                _this2._emitter.emit(_constants.EVENTS.I_AM_MASTER);
                             }
-                            if ((wasMaster || isInit) && !_this3._isMaster) {
-                                _this3._emitter.emit(_constants.EVENTS.I_AM_SLAVE);
+                            if ((wasMaster || isInit) && !_this2._isMaster) {
+                                _this2._emitter.emit(_constants.EVENTS.I_AM_SLAVE);
                             }
                             return _context6.finish(21);
 
@@ -541,7 +537,7 @@ function runActivityQueue(tickTimeInSeconds, marginTimeForRenew) {
                             return _context6.stop();
                     }
                 }
-            }, _callee6, _this3, [[3, 18, 21, 28]]);
+            }, _callee6, _this2, [[3, 18, 21, 28]]);
         }));
 
         return function doTick() {
