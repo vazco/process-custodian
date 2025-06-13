@@ -2,7 +2,7 @@
     <a href="https://github.com/vazco">vazco</a>/Process Custodian
 </h1>
 
-&nbsp;
+**[Deprecated] This project is no longer maintained.**
 
 This package helps with organizing of tasks between few instances of same app, It can identify processes and track them activity.
 
